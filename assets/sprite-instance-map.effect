@@ -163,41 +163,41 @@ CCProgram vs %{
     Mat23 world = Mat23(a_pos_rotate_scale[0], a_pos_rotate_scale[1], a_pos_rotate_scale[2], a_pos_rotate_scale[3], a_pos_translate[0], a_pos_translate[1]);
     // combine
     Mat23 res = mat23Mul(world, local);
-    mat4 matWorld = mat4(
-      res.a, res.b, 0, 0,
-      res.c, res.d, 0, 0,
-      0, 0, 1, 0,
-      res.tx, res.ty, 0, 1
-    );
-    // final
-    pos = cc_matViewProj * matWorld * pos;
+    // mat4 matWorld = mat4(
+    //   res.a, res.b, 0, 0,
+    //   res.c, res.d, 0, 0,
+    //   0, 0, 1, 0,
+    //   res.tx, res.ty, 0, 1
+    // );
+    // // final
+    // pos = cc_matViewProj * matWorld * pos;
 
-    // pos.xy = mat23Mul(res, pos.xy);
-    // pos = cc_matViewProj * pos;
+    pos.xy = mat23Mul(res, pos.xy);
+    pos = cc_matViewProj * pos;
 
     // #if USE_TEXTURE
 
     // method 1.
-    float cosUv = cos(a_uv_rotate * PI_H);
-    float sinUv = sin(a_uv_rotate * PI_H);
-    Mat23 matUV = Mat23(
-      cosUv, -sinUv,
-      sinUv, cosUv,
-      0., 0.
-    );
-    vec2 uvPos = mat23Mul(matUV, a_position.xy);
-    uvPos.x -= step(1., a_uv_rotate) * 2. * uvPos.x;
+    // float cosUv = cos(a_uv_rotate * PI_H);
+    // float sinUv = sin(a_uv_rotate * PI_H);
+    // Mat23 matUV = Mat23(
+    //   cosUv, -sinUv,
+    //   sinUv, cosUv,
+    //   0., 0.
+    // );
+    // vec2 uvPos = mat23Mul(matUV, a_position.xy);
+    // uvPos.x -= step(1., a_uv_rotate) * 2. * uvPos.x;
 
-    v_uv0 = a_uv_matrix.xy + (a_uv_matrix.zw - a_uv_matrix.xy) * uvPos;
+    // v_uv0 = a_uv_matrix.xy + (a_uv_matrix.zw - a_uv_matrix.xy) * uvPos;
 
     // method 2.
-    // float uvRotate = floor(a_uv_rotate + 0.5);
-    // if (uvRotate == 0.) {
-    //   v_uv0 = a_uv_matrix.xy + (a_uv_matrix.zw - a_uv_matrix.xy) * a_position.xy;
-    // }
-    // else {
-    //   v_uv0 = a_uv_matrix.xy + (a_uv_matrix.zw - a_uv_matrix.xy) * a_position.yx;
-    // }
+    float uvRotate = floor(a_uv_rotate + 0.5);
+    if (uvRotate == 0.) {
+      v_uv0 = a_uv_matrix.xy + (a_uv_matrix.zw - a_uv_matrix.xy) * a_position.xy;
+    }
+    else {
+      v_uv0 = a_uv_matrix.xy + (a_uv_matrix.zw - a_uv_matrix.xy) * a_position.yx;
+    }
 
     // #endif
 
